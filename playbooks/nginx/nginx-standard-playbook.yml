@@ -1,0 +1,34 @@
+- name: Configurar Nginx com estrutura padrão
+  hosts: azure_vms
+  become: yes
+  vars:
+    domain_name: infra.capitalsistemas.srv.br
+    
+  tasks:
+    - name: Atualizar lista de pacotes
+      apt:
+        update_cache: yes
+
+    - name: Instalar Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Criar configuração personalizada do Nginx
+      template:
+        src: templates/nginx-custom.conf.j2
+        dest: /etc/nginx/conf.d/{{ domain_name }}.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Recarregar Nginx
+
+  handlers:
+    - name: Testar e Recarregar Nginx
+      block:
+        - name: Testar configuração do Nginx
+          command: sudo nginx -t
+        - name: Recarregar Nginx
+          service:
+            name: nginx
+            state: reloaded
