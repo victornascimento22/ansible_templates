@@ -2,7 +2,7 @@
   hosts: azure_vms
   become: yes
   vars:
-    domain_name: infra.capitalsistemas.srv.br
+    domain_name: 
     
   tasks:
     - name: Atualizar lista de pacotes
